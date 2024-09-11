@@ -4,13 +4,21 @@ from django.views.decorators.csrf import csrf_exempt
 import logging
 from openai import OpenAI  # Ensure correct OpenAI client for NVIDIA Llama-3
 import json
+import os
+from cryptography.fernet import Fernet
+
+
+encryption_key = os.getenv('ENCRYPTION_KEY')
+cipher_suite = Fernet(encryption_key.encode())
+encrypted_key = os.getenv('ENCRYPTED_API_KEY')
+decrypted_api_key = cipher_suite.decrypt(encrypted_key.encode()).decode()
 
 logger = logging.getLogger(__name__)
 
 # Initialize the OpenAI client for NVIDIA Llama-3
 client = OpenAI(
     base_url="https://integrate.api.nvidia.com/v1",
-    api_key="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"
+    api_key=decrypted_api_key
 )
 
 @csrf_exempt
