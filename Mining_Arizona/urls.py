@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from Mining_Arizona.accounts.views import register, LoginView
+from Mining_Arizona.Tailings_treatment.tailings_treatment import process_tailings_form
 
 
 
@@ -24,4 +25,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', register, name='register'),
     path('login/', LoginView.as_view(), name='login'),
+    path('process-form/', process_tailings_form, name='process_form'),
 ]
