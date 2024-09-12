@@ -8,10 +8,11 @@ import os
 from cryptography.fernet import Fernet
 
 
-encryption_key = os.getenv('ENCRYPTION_KEY')
+'''encryption_key = os.getenv('ENCRYPTION_KEY')
 cipher_suite = Fernet(encryption_key.encode())
 encrypted_key = os.getenv('ENCRYPTED_API_KEY')
-decrypted_api_key = cipher_suite.decrypt(encrypted_key.encode()).decode()
+decrypted_api_key = cipher_suite.decrypt(encrypted_key.encode()).decode()'''
+decrypted_api_key = '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'
 
 logger = logging.getLogger(__name__)
 
@@ -60,9 +61,33 @@ def process_tailings_form(request):
             - Treatment objectives: {", ".join(treatment_objectives)}
             - Available technologies: {", ".join(technologies)}
             - Location: {location}
-            Based on this information, provide a step-by-step procedure to treat the tailings.
-            """
 
+            Based on this information and considering the location-specific regulations and environmental conditions, please provide:
+
+            **Procedure:**
+            A detailed, step-by-step procedure to effectively treat the tailings, including:
+            1. **Duration**: Estimated time required for each step of the process.
+            2. **Budget**: Estimated cost for each stage of the treatment, including labor, materials, and equipment.
+            3. **Treatment objectives**: Specific types and quantities of neutralizing agents required.
+            4. **Available Technologies**: Types and specifications of filtration systems to be used .
+            5. **Plan**: A comprehensive treatment plan including any pre-treatment, main treatment steps, and post-treatment processes.
+
+            **Safety Protocols:**
+            Safety protocols specifically tailored to the procedure outlined above, including:
+            1. **Personal Protective Equipment (PPE)**: Details on the type and specifications of PPE required.
+            2. **Chemical Handling**: Guidelines for handling and storage of chemicals used in the treatment.
+            3. **Dust Control**: Specific methods and equipment for controlling dust emissions.
+            4. **Spill Response**: Detailed procedures and materials for managing spills.
+            5. **Monitoring and Sampling**: Frequency and methods for monitoring the treatment process and sampling.
+
+            **Laws & Regulations:**
+            Applicable laws and regulations for tailings treatment in the specified location, considering:
+            1. **Federal Regulations**: Relevant federal guidelines and compliance requirements.
+            2. **State Regulations**: Specific state regulations applicable to the location.
+            3. **Local Regulations**: Any additional local ordinances or requirements that must be followed.
+
+            Please ensure that the procedure is accurate and tailored to the provided data, that the safety protocols are aligned with the procedure, and that the laws and regulations are relevant to both the location and the treatment process.
+            """
             # Send the prompt to the LLM API using NVIDIA's OpenAI client
             completion = client.chat.completions.create(
                 model="meta/llama-3.1-405b-instruct",  # Ensure the correct model is being used
