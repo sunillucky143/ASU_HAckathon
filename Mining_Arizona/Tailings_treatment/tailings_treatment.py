@@ -65,12 +65,15 @@ def process_tailings_form(request):
             Based on this information and considering the location-specific regulations and environmental conditions, please provide:
 
             **Procedure:**
+            (Try to reduce the budget of the procedure)
             A detailed, step-by-step procedure to effectively treat the tailings, including:
             1. **Duration**: Estimated time required for each step of the process.
-            2. **Budget**: Estimated cost for each stage of the treatment, including labor, materials, and equipment.
+            2. **Budget**: Estimated cost for each stage of the treatment, including labor, materials & Provide materials Required, and equipment & Equipment Required.
             3. **Treatment objectives**: Specific types and quantities of neutralizing agents required.
             4. **Available Technologies**: Types and specifications of filtration systems to be used .
-            5. **Plan**: A comprehensive treatment plan including any pre-treatment, main treatment steps, and post-treatment processes.
+            7. **Overall Budget**: Estimated budget, including labor, materials, and equipment.
+            6. **Plan**: A clear treatment procedure stp-by-step.
+            8.suggest new ideas that makes benefit.
 
             **Safety Protocols:**
             Safety protocols specifically tailored to the procedure outlined above, including:
@@ -81,12 +84,13 @@ def process_tailings_form(request):
             5. **Monitoring and Sampling**: Frequency and methods for monitoring the treatment process and sampling.
 
             **Laws & Regulations:**
-            Applicable laws and regulations for tailings treatment in the specified location, considering:
+            Applicable laws and regulations for tailings treatment in the specified location: {location}, considering:
             1. **Federal Regulations**: Relevant federal guidelines and compliance requirements.
             2. **State Regulations**: Specific state regulations applicable to the location.
             3. **Local Regulations**: Any additional local ordinances or requirements that must be followed.
 
             Please ensure that the procedure is accurate and tailored to the provided data, that the safety protocols are aligned with the procedure, and that the laws and regulations are relevant to both the location and the treatment process.
+            generate respone with putting ////t infront of saftey_protocls, and laws & regulations. to make it easier to split.
             """
             # Send the prompt to the LLM API using NVIDIA's OpenAI client
             completion = client.chat.completions.create(
@@ -101,13 +105,29 @@ def process_tailings_form(request):
             print("Completion response:", completion)
 
             # Extract the generated content from the API response
+            data = {}
             if completion.choices and len(completion.choices) > 0:
                 generated_text = completion.choices[0].message.content
+                data_division = generated_text.split("////t")
+                data = {
+                    "success": True,
+                    "response":{
+                        "procedure": data_division[0],
+                        "safetyProtocols": data_division[1],
+                        "lawsAndRegulations": data_division[2]
+                    }
+                }
+                print(data.get("response").get("procedure"))
+                print(data.get("response").get("safetyProtocols"))
+                print(data.get("response").get("lawsAndRegulations"))
             else:
                 generated_text = "No response generated."
+                data = {
+                    "Error": generated_text
+                }
 
             # Return the generated response in a JSON response
-            return JsonResponse({"success": True, "response": generated_text})
+            return JsonResponse({"success": True, "response": data})
 
         except Exception as e:
             # Log the exception for debugging
