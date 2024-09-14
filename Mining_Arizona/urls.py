@@ -16,8 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from Mining_Arizona.accounts.views import register, LoginView
+from Mining_Arizona.accounts.views import register, LoginView, PostView, CommentView
 from Mining_Arizona.Tailings_treatment.tailings_treatment import process_tailings_form
+
 
 
 
@@ -26,4 +27,7 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('login/', LoginView.as_view(), name='login'),
     path('process-form/', process_tailings_form, name='process_form'),
+    path('post/', PostView.as_view(), name='post'),
+    path('comment/', CommentView.as_view(), name='comment'),
+
 ]

@@ -1,5 +1,10 @@
+from tokenize import Comment
+
 from rest_framework import serializers
 from django.contrib.auth.models import User
+
+from accounts.models import Post
+
 
 class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,3 +19,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Post
+        fields = ['procedure', 's_p', 'l_a_r', 'access']
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Comment
+        fields = '__all__'

@@ -1,11 +1,13 @@
+from django.template.defaulttags import comment
 from rest_framework.decorators import api_view
-from .serializer import RegistrationSerializer
-from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
+from .serializer import *
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
+from accounts.models import *
 
 @api_view(['POST'])
 def register(request):
@@ -38,15 +40,53 @@ class LoginView(APIView):
 
                 # Authenticate manually by checking the password
                 if email_user.check_password(password):
-                    token, created = Token.objects.get_or_create(user=email_user)
-                    return Response({'token': token.key}, status=status.HTTP_200_OK)
+                    refresh = RefreshToken.for_user(email_user)
+                    return Response({
+                        'refresh': str(refresh),
+                        'access': str(refresh.token),
+                    }, status=status.HTTP_200_OK)
                 else:
                     return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
             # Username-based authentication
             user = authenticate(request, username=username, password=password)
             if user is not None:
-                token, created = Token.objects.get_or_create(user=user)
-                return Response({'token': token.key}, status=status.HTTP_200_OK)
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.token),
+                }, status=status.HTTP_200_OK)
             else:
                 return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class PostView(APIView):
+    def get(self, request):
+        output = [{'post_id':output.unique_id,
+                   'procedure': output.procedure,
+                   'saftey_protocols': output.s_p,
+                   'lawsAndRegulations': output.l_a_r,
+                   'access': output.access}
+                  for output in Post.objects.all()]
+        return Response(output)
+    def post(self, request):
+        post_serializer = PostSerializer(data=request.data)
+        if post_serializer.is_valid(raise_exception=True):
+            post_serializer.save()
+            return Response(post_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CommentView(APIView):
+    def get(self, request):
+        output = [{
+            'post_id': output.unique_id,
+            'comment': output.comment,}
+        for output in Comments.objects.all()]
+        return Response(output)
+    def post(self, request):
+        comment_serializer = CommentSerializer(data=request.data)
+        if comment_serializer.is_valid(raise_exception=True):
+            comment_serializer.save()
+            return Response(comment_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
