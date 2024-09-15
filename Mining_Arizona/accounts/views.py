@@ -1,5 +1,5 @@
-from django.template.defaulttags import comment
 from rest_framework.decorators import api_view
+from django.http import JsonResponse
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializer import *
 from rest_framework.response import Response
@@ -19,6 +19,15 @@ def register(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # In your views.py
+def comment_count(request):
+        try:
+            count = Comments.objects.count()
+            print(count)
+            return JsonResponse({'count': count})
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            return JsonResponse({'error': 'An error occurred while fetching the comment count.'}, status=500)
+
 
 class LoginView(APIView):
         def post(self, request):
@@ -64,8 +73,7 @@ class PostView(APIView):
         output = [{'post_id':output.unique_id,
                    'procedure': output.procedure,
                    'saftey_protocols': output.s_p,
-                   'lawsAndRegulations': output.l_a_r,
-                   'access': output.access}
+                   'lawsAndRegulations': output.l_a_r}
                   for output in Post.objects.all()]
         return Response(output)
     def post(self, request):
@@ -76,17 +84,25 @@ class PostView(APIView):
         else:
             return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+# views.py
+
 class CommentView(APIView):
     def get(self, request):
-        output = [{
-            'post_id': output.unique_id,
-            'comment': output.comment,}
-        for output in Comments.objects.all()]
-        return Response(output)
+        output = [{'post_id': comment.post_id, 'comment': comment.comment, 'risk_factor': comment.risk_factor} for comment in Comments.objects.all()]
+
+        if output:
+            return Response(output, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': 'No comments found for this post.'}, status=status.HTTP_404_NOT_FOUND)
+
     def post(self, request):
+        # Attach post_id to the request data
         comment_serializer = CommentSerializer(data=request.data)
+
         if comment_serializer.is_valid(raise_exception=True):
             comment_serializer.save()
             return Response(comment_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

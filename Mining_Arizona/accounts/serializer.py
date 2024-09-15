@@ -1,8 +1,7 @@
-from tokenize import Comment
 
 from rest_framework import serializers
 from django.contrib.auth.models import User
-
+from accounts.models import Comments
 from accounts.models import Post
 
 
@@ -27,5 +26,5 @@ class PostSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
-        model=Comment
-        fields = '__all__'
+        model = Comments
+        fields = ['risk_factor','comment']

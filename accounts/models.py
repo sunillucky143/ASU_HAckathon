@@ -10,11 +10,15 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     access = models.CharField(max_length=10)
 
+
 class Comments(models.Model):
-    unique_id = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     comment = models.TextField()
+    risk_factor = models.CharField(max_length=10)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.comment
 
 
 
